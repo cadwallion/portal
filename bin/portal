@@ -32,10 +32,10 @@ command :add do |c|
   c.flag [:p, :port]
 
   c.action do |global_options,options,args|
-    if args.length < 1
-      raise 'You must specify the name of the portal to add'
+    if args.length < 2
+      raise 'You must specify the name of the portal to add and the domain'
     else
-      Portal.add(args.first, options)
+      Portal.add(args[0], args[1], options)
     end
   end
 end
