@@ -1,0 +1,3 @@
+module Portal
+  VERSION = '0.0.1'
+end

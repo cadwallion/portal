@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# 1.9 adds realpath to resolve symlinks; 1.8 doesn't
+# have this method, so we add it so we get resolved symlinks
+# and compatibility
+unless File.respond_to? :realpath
+  class File #:nodoc:
+    def self.realpath path
+      return realpath(File.readlink(path)) if symlink?(path)
+      path
+    end
+  end
+end
+$: << File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib')
+require 'rubygems'
+require 'gli'
+require 'portal'
+
+include GLI
+
+program_desc 'Manages SSH portals as easy hosts'
+
+version Portal::VERSION
+
+desc 'Adds a portal to the list'
+command :add do |c|
+  c.desc 'user to connect as. default: current user'
+  c.default_value `whoami`
+  c.flag [:u, :user]
+
+  c.desc 'port to connect to. default: 22'
+  c.default_value '22'
+  c.flag [:p, :port]
+
+  c.action do |global_options,options,args|
+    if args.length < 1
+      raise 'You must specify the name of the portal to add'
+    else
+      Portal.add(args.first, options)
+    end
+  end
+end
+
+desc 'Remove a portal for a given name'
+command :rm do |c|
+  c.action do |global_options,options,args|
+    if args.length < 1
+      raise 'You must specify the name of the portal to remove.'
+    else
+      Portal.remove(args.first)
+    end
+  end
+end
+
+desc 'List all portals'
+command :list do |c|
+  c.action do |global_options,options,args|
+    puts Portal.list
+  end
+end
+
+exit GLI.run(ARGV)

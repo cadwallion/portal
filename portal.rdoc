@@ -1,0 +1,5 @@
+= portal
+
+Generate this with
+    portal rdoc
+After you have described your command line interface

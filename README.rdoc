@@ -1,0 +1,12 @@
+= portal
+
+Portal is a command-line application that controls configuring your .ssh/config
+for ssh hosts to programmatically add default host information.  It reads the
+file and auto-loads any hosts you have manually configured so you will not lose
+anything done manually.
+
+*NOTE*: It currently does not respect anything else in the config file and will
+blow it away.  This a going to be resolved shortly.
+
+:include:portal.rdoc
+
