@@ -11,20 +11,24 @@ module Portal
 
     def portals
       unless @portals
-        file = File.read(conf_file)
-        host_blocks = file.split /^Host/
-        hosts = {} 
-        host_blocks.each do |h|
-          lines = h.split("\n")
-          name = lines.shift#.strip
-          unless name.nil?
-            info = {}
-
-            lines.each do |l|
-              keyword, value = l.strip.split
-              info[keyword.to_s] = value
+        lines = File.readlines(conf_file)
+        host_block = false
+        hosts = {}
+        host = {}
+        name = nil
+        lines.each do |line|
+          if match = line.match(/Host (.+)/)
+            hosts[name] = host.dup
+            host = {}
+            name = match[1]
+            host_block = true
+          else
+            if host_block
+              match = line.match(/(\S+) (.+)$/)
+              host[match[1]] = match[2]
+            else
+              # blank line, extra, unparseable info
             end
-            hosts[name.strip] = info
           end
         end
         @portals = hosts
@@ -38,7 +42,7 @@ module Portal
 
     def clear_all!
       clear_all
-      write_to_conf
+      File.open(conf_file, 'w+') { |f| }
     end
 
     def add name, domain, options = {}
@@ -82,6 +86,7 @@ module Portal
 
     def write_to_conf
       file = File.open(conf_file, 'w+')
+
       portals.each_key do |key|
         file << "Host #{key}\n"
         portal = portals[key]
